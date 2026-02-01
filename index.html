@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>8-BIT SOLITAIRE v15</title>
+<title>8-BIT SOLITAIRE v18</title>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1519394255615630" crossorigin="anonymous"></script>
 
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
     :root {
         --bg-color: #2c5c44;
-        --card-w: 46px;
+        --card-w: 46px; /* JSで自動計算 */
         --card-h: 70px;
         --spacing: 6px;
         --text-color: #fff;
@@ -31,7 +31,7 @@
         min-height: 100vh;
         overflow-y: auto;
         position: relative;
-        padding-bottom: calc(var(--ad-height) + 20px);
+        padding-bottom: calc(var(--ad-height) + 60px);
         box-sizing: border-box;
     }
 
@@ -44,11 +44,23 @@
         font-family: 'Press Start 2P', cursive;
     }
 
+    /* --- ゲームエリアの制限（PC対策） --- */
+    #game-container {
+        width: 100%;
+        max-width: 600px; 
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border: 2px solid rgba(255,255,255,0.1);
+        border-radius: 10px;
+        padding: 10px;
+        background-color: rgba(0,0,0,0.1);
+    }
+
     #top-row {
         display: flex;
         justify-content: space-between;
         width: 100%;
-        max-width: 480px;
         margin-bottom: 20px;
         height: var(--card-h);
         flex-shrink: 0;
@@ -96,7 +108,7 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        font-size: 20px;
+        font-size: calc(var(--card-w) * 0.4);
         color: rgba(255,255,255,0.15);
         pointer-events: none;
     }
@@ -106,7 +118,6 @@
         justify-content: center;
         gap: var(--spacing);
         width: 100%;
-        max-width: 480px;
         height: auto;
         min-height: 500px; 
         position: relative;
@@ -131,17 +142,13 @@
         justify-content: center;
         align-items: flex-start; 
         padding-top: 4px; 
-        font-size: 14px;
+        font-size: calc(var(--card-w) * 0.35);
         z-index: 10;
         box-sizing: border-box;
         cursor: pointer;
     }
-    
-    .card::after {
-        content: ''; position: absolute; top: -10px; left: -10px; right: -10px; bottom: -10px; z-index: 1;
-    }
-
-    #waste .card { position: absolute; top: 0; }
+    .card::after { content: ''; position: absolute; top: -10px; left: -10px; right: -10px; bottom: -10px; z-index: 1; }
+    #waste .card { position: absolute; top: 0; left: 0; }
 
     .card.dragging {
         opacity: 0.9;
@@ -163,33 +170,42 @@
     }
     .card.back span { display: none; }
 
-    /* --- ボタンエリア修正 --- */
+    /* --- ボタンエリア --- */
     #controls {
-        position: absolute;
+        position: fixed;
+        bottom: calc(var(--ad-height) + 20px);
+        left: 50%;
+        transform: translateX(-50%);
         display: flex;
         gap: 15px;
-        z-index: 100;
-        transition: top 0.2s ease-out;
-        padding-bottom: 20px;
-        /* 画面中央に配置する設定 */
-        left: 50% !important;
-        transform: translateX(-50%);
-        width: 100%;
-        justify-content: center;
+        z-index: 4000;
+        background-color: rgba(44, 92, 68, 0.95);
+        padding: 10px 20px;
+        border-radius: 20px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        flex-wrap: nowrap;
+        white-space: nowrap;
     }
 
     button {
         background: #000;
         color: #fff;
         border: 2px solid #fff;
-        padding: 10px 20px; /* タップしやすいように少し大きく */
-        font-size: 14px;
+        padding: 8px 16px;
+        font-size: 12px;
         cursor: pointer;
-        box-shadow: 4px 4px 0 rgba(0,0,0,0.5);
+        box-shadow: 3px 3px 0 rgba(0,0,0,0.5);
         white-space: nowrap;
+        border-radius: 4px;
     }
-    button:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 rgba(0,0,0,0.5); }
+    button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 rgba(0,0,0,0.5); }
     button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    #btn-mini {
+        background: #ff9800;
+        color: #000;
+        border-color: #fff;
+    }
 
     /* --- 広告エリア --- */
     #ad-container {
@@ -206,11 +222,7 @@
         border-top: 2px solid #fff;
     }
 
-    .ad-placeholder {
-        color: #aaa;
-        font-size: 12px;
-        text-align: center;
-    }
+    .ad-placeholder { color: #aaa; font-size: 12px; text-align: center; }
 
     #victory-screen {
         display: none;
@@ -230,44 +242,39 @@
     .victory-btn:hover { background: #fff; color: #000; }
     @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-10px); } }
 
-    @media (min-width: 600px) {
-        :root { --card-w: 75px; --card-h: 110px; --spacing: 18px; }
-        .card { font-size: 24px; padding-top: 12px; border-width: 4px; box-shadow: 3px 3px 0px rgba(0,0,0,0.3); }
-        .card.back { border: 3px solid #fff; }
-        #stock-area { min-width: calc(var(--card-w) * 2 + var(--spacing) + 60px); }
-        .victory-title { font-size: 50px; }
-        .slot { border-radius: 6px; }
-    }
 </style>
 </head>
 <body>
 
-    <div id="top-row">
-        <div class="group" id="foundations">
-            <div class="slot foundation" data-type="foundation" data-id="0" data-mark="A♠"></div>
-            <div class="slot foundation" data-type="foundation" data-id="1" data-mark="A♥"></div>
-            <div class="slot foundation" data-type="foundation" data-id="2" data-mark="A♣"></div>
-            <div class="slot foundation" data-type="foundation" data-id="3" data-mark="A♦"></div>
+    <div id="game-container">
+        <div id="top-row">
+            <div class="group" id="foundations">
+                <div class="slot foundation" data-type="foundation" data-id="0" data-mark="A♠"></div>
+                <div class="slot foundation" data-type="foundation" data-id="1" data-mark="A♥"></div>
+                <div class="slot foundation" data-type="foundation" data-id="2" data-mark="A♣"></div>
+                <div class="slot foundation" data-type="foundation" data-id="3" data-mark="A♦"></div>
+            </div>
+            <div class="group" id="stock-area">
+                <div class="slot waste" id="waste" data-type="waste"></div>
+                <div class="slot stock" id="stock" data-type="stock"></div>
+            </div>
         </div>
-        <div class="group" id="stock-area">
-            <div class="slot waste" id="waste" data-type="waste"></div>
-            <div class="slot stock" id="stock" data-type="stock"></div>
-        </div>
-    </div>
 
-    <div id="tableau">
-        <div class="column slot tableau" data-type="tableau" data-id="0"></div>
-        <div class="column slot tableau" data-type="tableau" data-id="1"></div>
-        <div class="column slot tableau" data-type="tableau" data-id="2"></div>
-        <div class="column slot tableau" data-type="tableau" data-id="3"></div>
-        <div class="column slot tableau" data-type="tableau" data-id="4"></div>
-        <div class="column slot tableau" data-type="tableau" data-id="5"></div>
-        <div class="column slot tableau" data-type="tableau" data-id="6"></div>
+        <div id="tableau">
+            <div class="column slot tableau" data-type="tableau" data-id="0"></div>
+            <div class="column slot tableau" data-type="tableau" data-id="1"></div>
+            <div class="column slot tableau" data-type="tableau" data-id="2"></div>
+            <div class="column slot tableau" data-type="tableau" data-id="3"></div>
+            <div class="column slot tableau" data-type="tableau" data-id="4"></div>
+            <div class="column slot tableau" data-type="tableau" data-id="5"></div>
+            <div class="column slot tableau" data-type="tableau" data-id="6"></div>
+        </div>
     </div>
 
     <div id="controls">
         <button id="btn-reset" onclick="initGame()">リセット</button>
-        <button id="btn-undo" onclick="undo()">一つ戻す</button>
+        <button id="btn-undo" onclick="undo()">１つ戻す</button>
+        <button id="btn-mini" onclick="openMiniWindow()">小窓で遊ぶ</button>
     </div>
 
     <div id="ad-container">
@@ -287,6 +294,7 @@
     const SUITS = ['♠', '♥', '♣', '♦'];
     const COLORS = {'♠':'black', '♥':'red', '♣':'black', '♦':'red'};
     const NUMBERS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+    const STORAGE_KEY = 'solitaire_save_v1';
     
     let deck = [], stock = [], waste = [], foundations = [[], [], [], []], tableau = [[], [], [], [], [], [], []];
     let historyStack = [];
@@ -298,6 +306,70 @@
     let dragStartPos = { x: 0, y: 0 };
     let currentDroppable = null;
     let lastTap = 0;
+
+    function adjustLayout() {
+        const container = document.getElementById('game-container');
+        const w = container ? container.clientWidth : window.innerWidth;
+        const maxW = 600; 
+        const targetW = Math.min(w, maxW);
+
+        let newCardW = Math.floor(targetW / 8.2);
+        
+        if (newCardW < 30) newCardW = 30; 
+        if (newCardW > 80) newCardW = 80;
+
+        let newCardH = Math.floor(newCardW * 1.5);
+        let newSpacing = Math.floor(newCardW * 0.15);
+
+        document.documentElement.style.setProperty('--card-w', newCardW + 'px');
+        document.documentElement.style.setProperty('--card-h', newCardH + 'px');
+        document.documentElement.style.setProperty('--spacing', newSpacing + 'px');
+
+        if (window.opener && window.innerWidth < 500) {
+            const btnMini = document.getElementById('btn-mini');
+            if(btnMini) btnMini.style.display = 'none';
+        }
+    }
+
+    window.addEventListener('resize', adjustLayout);
+    window.addEventListener('load', adjustLayout);
+    window.addEventListener('orientationchange', () => { setTimeout(adjustLayout, 100); });
+
+    function openMiniWindow() {
+        window.open(window.location.href, 'solitaire_mini', 'width=450,height=750,resizable=yes,scrollbars=yes');
+    }
+
+    /* ▼▼▼ セーブ・ロード機能 ▼▼▼ */
+    function saveGame() {
+        if(isAutoPlaying) return; // オートプレイ中は保存しない
+        const saveData = {
+            stock: stock,
+            waste: waste,
+            foundations: foundations,
+            tableau: tableau,
+            historyStack: historyStack
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(saveData));
+    }
+
+    function loadGame() {
+        const json = localStorage.getItem(STORAGE_KEY);
+        if (!json) return false;
+        try {
+            const data = JSON.parse(json);
+            stock = data.stock || [];
+            waste = data.waste || [];
+            foundations = data.foundations || [[],[],[],[]];
+            tableau = data.tableau || [[],[],[],[],[],[],[]];
+            historyStack = data.historyStack || [];
+            render();
+            return true;
+        } catch(e) {
+            console.error("Save data corrupted", e);
+            return false;
+        }
+    }
+    /* ▲▲▲ ▲▲▲ */
 
     function createDeck() {
         let d = [];
@@ -320,7 +392,11 @@
         const state = JSON.parse(historyStack.pop());
         stock = state.stock; waste = state.waste; foundations = state.foundations; tableau = state.tableau;
         render();
+        // Undo後もセーブ
+        saveGame();
     }
+    
+    // Resetボタン用（強制的に新規ゲーム）
     function initGame() {
         document.getElementById('victory-screen').style.display = 'none';
         isAutoPlaying = false;
@@ -333,33 +409,9 @@
             }
         }
         render();
-        setTimeout(updateControlsPosition, 0);
+        adjustLayout();
+        saveGame(); // 新規状態を保存
     }
-
-    function updateControlsPosition() {
-        const controls = document.getElementById('controls');
-        // 高さ位置のみ計算（カードの一番下 + 20px）
-        let maxBottom = 0;
-        const columns = document.querySelectorAll('.column');
-        columns.forEach(col => {
-            const rect = col.getBoundingClientRect();
-            let bottom = rect.top + window.scrollY + 85; 
-            const lastCard = col.lastElementChild;
-            if (lastCard && lastCard.classList.contains('card')) {
-                 const cardRect = lastCard.getBoundingClientRect();
-                 bottom = cardRect.bottom + window.scrollY;
-            }
-            if (bottom > maxBottom) maxBottom = bottom;
-        });
-        
-        const minHeight = 500; 
-        const finalTop = Math.max(maxBottom, minHeight) + 20;
-        
-        // 横位置はCSSで中央寄せ(left:50%)にしているのでtopだけ指定
-        controls.style.top = finalTop + 'px';
-    }
-
-    window.addEventListener('resize', updateControlsPosition);
 
     function render() {
         document.querySelectorAll('.card.dragging').forEach(el => el.remove());
@@ -377,11 +429,7 @@
             const realIdx = startIndex + i;
             const isTop = (realIdx === waste.length - 1);
             let div = createCardDiv(card, true, 'waste', 0, realIdx);
-            
-            /* ▼▼▼ 修正点: カードを重ねて表示（ズレをなくす） ▼▼▼ */
             div.style.left = '0px'; 
-            /* ▲▲▲ 修正ここまで ▲▲▲ */
-            
             div.style.zIndex = i;
             if (!isTop) div.style.pointerEvents = 'none';
             wasteEl.appendChild(div);
@@ -404,7 +452,9 @@
         }
         
         if(!isAutoPlaying) setupDragEvents();
-        updateControlsPosition();
+        
+        // ★描画のたびに自動セーブ★
+        saveGame();
     }
 
     function createCardDiv(card, faceUp, loc, col, idx) {
@@ -719,6 +769,8 @@
         if (count === 52) {
             setTimeout(() => {
                 document.getElementById('victory-screen').style.display = 'flex';
+                // クリア時はセーブデータを消す（次は新規ゲーム）
+                localStorage.removeItem(STORAGE_KEY);
             }, 300);
         }
     }
@@ -728,7 +780,10 @@
         alert("ブラウザのセキュリティ制限によりウィンドウを閉じられませんでした。\n手動でタブを閉じてください。");
     }
 
-    initGame();
+    // ★起動時処理: セーブがあればロード、なければ新規作成
+    if (!loadGame()) {
+        initGame();
+    }
 </script>
 </body>
 </html>
