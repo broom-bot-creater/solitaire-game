@@ -14,9 +14,7 @@
         --card-h: 70px;
         --spacing: 6px;
         --text-color: #fff;
-        /* ▼▼▼ 修正: 広告の高さを少しスリムに調整（上下に入るため） ▼▼▼ */
         --ad-height: 60px; 
-        /* ▲▲▲ ▲▲▲ */
     }
 
     body {
@@ -36,12 +34,9 @@
         box-sizing: border-box;
         touch-action: manipulation;
         
-        /* ▼▼▼ 修正: 上下両方に広告分の余白を確保 ▼▼▼ */
-        /* 上部：広告の高さ + 少し隙間 */
+        /* 上下両方に広告分の余白を確保 */
         padding-top: calc(var(--ad-height) + 10px);
-        /* 下部：広告の高さ + ボタンエリアの余裕 */
         padding-bottom: calc(var(--ad-height) + 60px);
-        /* ▲▲▲ ▲▲▲ */
     }
 
     /* フォント設定 */
@@ -241,14 +236,11 @@
     }
     .ad-placeholder { color: #aaa; font-size: 12px; text-align: center; }
 
-    /* ▼▼▼ 新設: 上部広告エリア ▼▼▼ */
     #top-ad-container {
         top: 0;
         border-bottom: 2px solid #fff;
     }
-    /* ▲▲▲ ▲▲▲ */
 
-    /* 既存: 下部広告エリア */
     #bottom-ad-container {
         bottom: 0;
         border-top: 2px solid #fff;
@@ -313,6 +305,7 @@
     <div id="bottom-ad-container" class="ad-container">
         <div class="ad-placeholder">下部広告スペース<br>(AdSense等のバナーを配置)</div>
     </div>
+    
     <div id="victory-screen">
         <div class="victory-title">CONGRATULATIONS!</div>
         <div class="victory-msg">ゲームクリア！<br>おめでとうございます！</div>
@@ -347,7 +340,10 @@
             <li style="margin-bottom: 5px;"><strong>空いた列：</strong> 場札の列にカードが1枚もなくなったスペースには、「K」のカードだけを移動させることができます。</li>
         </ul>
 
-    </div>
+        <div style="text-align: center; margin-top: 40px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 20px;">
+            <a href="policy.html" style="color: #aaa; font-size: 12px; text-decoration: none;">プライバシーポリシー・免責事項・運営者情報</a>
+        </div>
+        </div>
     <script>
     const SUITS = ['♠', '♥', '♣', '♦'];
     const COLORS = {'♠':'black', '♥':'red', '♣':'black', '♦':'red'};
